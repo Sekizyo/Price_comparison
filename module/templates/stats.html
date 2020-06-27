@@ -1,0 +1,24 @@
+﻿{% extends "layout.html" %}
+{% block content %}
+<h1 class="major"><center>Statystyki</center></h1>
+<div class="inner" style="text-align: left; padding-left: 200px">
+    <h3>Przedmioty: {{items}}</h3>
+    <h3>Ceny: {{prices}}</h3>
+    <hr />
+
+    <h3>Przedmioty Xkom: {{xkom}}</h3>
+    <h3>Przedmioty Euro: {{euro}}</h3>
+    <h3>Przedmioty Morele: {{morele}}</h3>
+    <h3>Przedmioty Media Expert: {{media}}</h3>
+    <hr />
+    <h3>Średnia ilość cen : {{avg}}</h3>
+    
+    <hr />
+    <h3>Ostatnie query: {{query_date}} {{query_time}}</h3>
+    <h3>Run time: {{query_run_time}} sec</h3>
+    <h3>Dodano: {{query_added}}</h3>
+
+</div>
+
+
+{% endblock content %}

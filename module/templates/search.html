@@ -1,0 +1,28 @@
+﻿{% extends "layout.html" %}
+{% block content %}
+<h1 class="major"><center>Test site</center></h1>
+<section id="main" class="wrapper">
+    <div style="text-align: center">
+        <h3>Test site</h3>
+		
+		<form action="http://localhost:5000/search_result" method="POST"  enctype="multipart/form-data">
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form.item.label(class="form-control-label") }}
+                    {{ form.item(    class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.sort_by.label(class="form-control-label") }}
+                    {{ form.sort_by(    class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </fieldset>
+
+        </form>
+        
+    </div>
+</section>
+
+{% endblock content %}
