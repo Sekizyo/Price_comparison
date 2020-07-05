@@ -9,27 +9,12 @@
         <h4>X_kom items: {{x_kom_len}}</h4>
 
         {% if x_kom_len == False %}
-        <h2>No items found</h2>
+        <h2>Nie znaleziono przedmiotów</h2>
         <br />
         {% else %}
         {% for x in range(x_kom_len) %}
         <ul>
-            <a href='{{x_link.pop(0)}}'><li>{{x_name.pop(0)}},  {{x_price.pop(0)}} // {{x_low_prices.pop(0)}}</li></a>
-        </ul>
-        {% endfor %}
-        {% endif %}
-    </div>
-    <hr />
-    
-    <div class="inner" style="text-align: left; padding-left: 200px">
-        <h4>Euro items: {{euro_len}}</h4>
-        {% if euro_len == False %}
-        <h2>Brak terminów</h2>
-        <br />
-        {% else %}
-        {% for x in range(euro_len) %}
-        <ul>
-            <a href='{{euro_link.pop(0)}}'><li>{{euro_name.pop(0)}},  {{euro_price.pop(0)}} // {{euro_low_prices.pop(0)}}</li></a>
+            <a href='{{x_link[x]}}'><li>{{x_name[x]}},  {{x_price[x]}} | {{x_high_prices[x]}} // {{x_low_prices[x]}}</li></a>
         </ul>
         {% endfor %}
         {% endif %}
@@ -39,12 +24,12 @@
     <div class="inner" style="text-align: left; padding-left: 200px">
         <h4>Morele items: {{morele_len}}</h4>
         {% if morele_len == False %}
-        <h2>Brak terminów</h2>
+        <h2>Nie znaleziono przedmiotów</h2>
         <br />
         {% else %}
         {% for x in range(morele_len) %}
         <ul>
-            <a href='{{morele_link.pop(0)}}'><li>{{morele_name.pop(0)}},  {{morele_price.pop(0)}} // {{morele_low_prices.pop(0)}}</li></a>
+            <a href='{{morele_link[x]}}'><li>{{morele_name[x]}},  {{morele_price[x]}} | {{morele_high_prices[x]}} // {{morele_low_prices[x]}}</li></a>
         </ul>
         {% endfor %}
         {% endif %}
@@ -54,12 +39,12 @@
     <div class="inner" style="text-align: left; padding-left: 200px">
         <h4>Media Expert items: {{media_len}}</h4>
         {% if media_len == False %}
-        <h2>Brak terminów</h2>
+        <h2>Nie znaleziono przedmiotów</h2>
         <br />
         {% else %}
         {% for x in range(media_len) %}
         <ul>
-            <a href='{{media_link.pop(0)}}'><li>{{media_name.pop(0)}},  {{media_price.pop(0)}} // {{media_low_prices.pop(0)}}</li></a>
+            <a href='{{media_link[x]}}'><li>{{media_name[x]}},  {{media_price[x]}} | {{media_high_prices[x]}} // {{media_low_prices[x]}}</li></a>
         </ul>
         {% endfor %}
         {% endif %}

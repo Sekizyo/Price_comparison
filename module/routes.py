@@ -7,8 +7,8 @@ from flask import render_template, url_for, flash, redirect, request, Response
 
 from module import app, db
 from module.models import Item, Prices
-from module.check import x_kom, euro, morele, media_expert, query_prep, check_stats, return_query_stats, update_prices, return_update_stats, return_search, compare, query_by_url
-from module.forms import Search_item, Query_items, Spec_item
+from module.check import x_kom, morele, media_expert, query_prep, check_stats, return_query_stats, update_prices, return_update_stats, return_search, return_lowest_price, return_highest_price, add_spec
+from module.forms import Search_item, Query_items, Spec_item, Spec_add
 
 now = datetime.datetime.now()
 now_date = now.strftime("%d-%m-%Y")
@@ -37,21 +37,22 @@ def search_result():
     item_name = form.item.data
     sort_by = form.sort_by.data
 
-    x_name, x_price, x_link, euro_name, euro_price, euro_link, morele_name, morele_price, morele_link, media_name, media_price, media_link = return_search(item_name, sort_by)
-    x_low_prices = compare(x_name)
-    euro_low_prices = compare(euro_name)
-    morele_low_prices = compare(morele_name)
-    media_low_prices = compare(media_name)
+    x_name, x_price, x_link, morele_name, morele_price, morele_link, media_name, media_price, media_link = return_search(item_name, sort_by)
+    x_low_prices = return_lowest_price(x_name)
+    morele_low_prices = return_lowest_price(morele_name)
+    media_low_prices = return_lowest_price(media_name)
+
+    x_high_prices = return_highest_price(x_name)
+    morele_high_prices = return_highest_price(morele_name)
+    media_high_prices = return_highest_price(media_name)
 
     x_kom_len = len(x_name)
-    euro_len = len(euro_name)
     morele_len = len(morele_name)
     media_len = len(media_name)
 
-    return render_template('search_result.html',item_name=item_name, x_name=x_name, x_price=x_price, x_low_prices=x_low_prices, x_link=x_link, x_kom_len=x_kom_len,
-        euro_name=euro_name, euro_price=euro_price, euro_low_prices=euro_low_prices, euro_link=euro_link, euro_len=euro_len,
-        morele_name=morele_name, morele_price=morele_price, morele_low_prices=morele_low_prices, morele_link=morele_link, morele_len=morele_len,
-        media_name=media_name, media_price=media_price, media_low_prices=media_low_prices, media_link=media_link, media_len=media_len)
+    return render_template('search_result.html',item_name=item_name, x_name=x_name, x_price=x_price, x_low_prices=x_low_prices, x_high_prices=x_high_prices, x_link=x_link, x_kom_len=x_kom_len,
+        morele_name=morele_name, morele_price=morele_price, morele_low_prices=morele_low_prices, morele_high_prices=morele_high_prices, morele_link=morele_link, morele_len=morele_len,
+        media_name=media_name, media_price=media_price, media_low_prices=media_low_prices, media_high_prices=media_high_prices, media_link=media_link, media_len=media_len)
 
 
 @app.route("/query", methods=['GET', 'POST'])
@@ -77,9 +78,17 @@ def spec():
 
 @app.route('/spec_add', methods=['GET', 'POST'])
 def spec_add():
+    form = Spec_add()
     
+    return render_template('spec_add.html', form=form)
 
-    return render_template('spec_add.html')
+@app.route('/spec_add2', methods=['GET', 'POST'])
+def spec_add():
+    form = Spec_add()
+    url = form.query.data
+    add_spec(url)
+    
+    return render_template('spec_add.html', form=form)
 
 @app.route('/spec_show', methods=['GET', 'POST'])
 def spec_show():
@@ -103,9 +112,6 @@ def spec_result():
     if choice == "x_kom":
         # spec_xkom(url)
         pass
-    if choice == "euro":
-        #spec_euro(url)
-        pass
     if choice == "morele":
         #spec_morele(url)
         pass
@@ -118,9 +124,9 @@ def spec_result():
 
 @app.route('/stats', methods=['GET', 'POST'])
 def stats():
-    items, prices, xkom, euro, morele, media, avg = check_stats()
+    items, prices, xkom, morele, media, avg = check_stats()
     query_date, query_time, query_run_time, query_added, query_match, query_searched, query_total = return_query_stats() 
-    return render_template('stats.html', items=items, prices=prices, xkom=xkom, euro=euro, morele=morele, media=media, avg=avg, query_date=query_date, query_time=query_time, query_run_time=query_run_time, query_added=query_added)
+    return render_template('stats.html', items=items, prices=prices, xkom=xkom, morele=morele, media=media, avg=avg, query_date=query_date, query_time=query_time, query_run_time=query_run_time, query_added=query_added)
 
 @app.route('/update', methods=['GET', 'POST'])
 def update():
@@ -130,5 +136,6 @@ def update():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    query_by_url("https://www.x-kom.pl/p/566358-smartfon-telefon-xiaomi-redmi-note-9-3-64gb-forest-green.html")
+    
+    
     return render_template('test.html')

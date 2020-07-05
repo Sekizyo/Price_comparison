@@ -22,21 +22,6 @@
     <hr />
     
     <div class="inner" style="text-align: left; padding-left: 200px">
-        <h4>Euro items: {{euro_len}}</h4>
-        {% if euro_len == False %}
-        <h2>Brak terminów</h2>
-        <br />
-        {% else %}
-        {% for x in range(euro_len) %}
-        <ul>
-            <a href='{{euro_link.pop(0)}}'><li>{{euro_name.pop(0)}},  {{euro_price.pop(0)}}</li></a>
-        </ul>
-        {% endfor %}
-        {% endif %}
-    </div>
-    <hr />
-    
-    <div class="inner" style="text-align: left; padding-left: 200px">
         <h4>Morele items: {{morele_len}}</h4>
         {% if morele_len == False %}
         <h2>Brak terminów</h2>

@@ -8,11 +8,14 @@ class Search_item(FlaskForm):
     submit = SubmitField('Potwierdz')
 
 class Query_items(FlaskForm):
-    query = SelectField("Query", validators=[DataRequired()], choices=[('all', "All"), ('x_kom', 'X-kom'), ('euro', 'Euro'), ('morele', 'Morele'), ('media_expert', 'Media expert')])
+    query = SelectField("Query", validators=[DataRequired()], choices=[('all', "All"), ('x_kom', 'X-kom'), ('morele', 'Morele'), ('media_expert', 'Media expert')])
     submit = SubmitField('Potwierdz')
 
 class Spec_item(FlaskForm):
     url = StringField("Url", validators=[DataRequired()])
-    choice = SelectField("Choice", validators=[DataRequired()], choices=[('all', "All"), ('x_kom', 'X-kom'), ('euro', 'Euro'), ('morele', 'Morele'), ('media_expert', 'Media expert')])
+    choice = SelectField("Choice", validators=[DataRequired()], choices=[('all', "All"), ('x_kom', 'X-kom'), ('morele', 'Morele'), ('media_expert', 'Media expert')])
+    submit = SubmitField('Potwierdz')
+class Spec_add(FlaskForm):
+    url = StringField("Url", validators=[DataRequired()])
     submit = SubmitField('Potwierdz')
     

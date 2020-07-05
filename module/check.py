@@ -46,47 +46,60 @@ def format_price(price):
         if flag == True:
             price_formated.append(letter)
 
-    if " " in price_formated:
-        price_formated.remove(" ")
+    for x in range(len(price_formated)):
+        if " " in price_formated:
+            price_formated.remove(" ")
 
-    if "," in price_formated:
-        price_formated.remove(",")
+        if "," in price_formated:
+            price_formated.remove(",")
 
-    if "\n" in price_formated:
-        price_formated.remove("\n")
+        if "\n" in price_formated:
+            price_formated.remove("\n")
 
-    if "z" in price_formated:
-        price_formated.remove("z")
+        if "z" in price_formated:
+            price_formated.remove("z")
 
-    if "ł" in price_formated:
-        price_formated.remove("ł")
+        if "ł" in price_formated:
+            price_formated.remove("ł")
 
-    if "o" in price_formated:
-        price_formated.remove("o")
+        if "o" in price_formated:
+            price_formated.remove("o")
 
-    if "d" in price_formated:
-        price_formated.remove("d")
+        if "d" in price_formated:
+            price_formated.remove("d")
 
-    if " " in price_formated:
-        price_formated.remove(" ")
+        if " " in price_formated:
+            price_formated.remove(" ")
+
+        if "\xa0" in price_formated:
+            price_formated.remove("\xa0")
+        
     price0 = ''.join(price_formated)
 
     return price0
-
+"""
 def format_name(name):
     name_formated = []
+    name_formated0 = []
+    end = []
     name_list = list(name)
-    flag = True
+        
+    for item in name_list:
+        name_formated.append(item)
 
-    for letter in name_list:
-        name_formated.append(letter)
-
-    if "\n" in name_formated:
-        name_formated.remove("\n")
-
-    name0 = ''.join(name_formated)
-
-    return name0
+    for word in name_formated:
+        l1 = list(word)
+        for l in l1:
+            if l == "\n" or l == "\t":
+                pass
+            else:
+                name_formated0.append(l)
+        end0 = "".join(name_formated0)
+        name_formated0.clear()
+        end.append(end0)
+        
+    return end
+"""
 
 def sort(name, price, link, sort0="price_low"):
     if sort0 == "name_low":
@@ -112,13 +125,13 @@ def sort(name, price, link, sort0="price_low"):
     if sort0 == "price_high":
         sort_by0 = True
 
-    price = [int(i) for i in price] 
-
+    price = [int(i) for i in price]
+    
     zipped = zip(price, name, link)
     zipped = sorted(zipped, reverse=sort_by0)
     price, name, link = zip(*zipped)
         
-    return (list(name), list(price), list(link))
+    return name, price, link
 
 def spec_save(name, price, url, shop): #TODO
     spec_item = Spec_Item(name=name, url=url, shop_id=shop)
@@ -178,9 +191,6 @@ def update_prices():
 
     url_xkom = []
     id_xkom = []
-
-    url_euro = [] 
-    id_euro = [] 
     
     url_morele = [] 
     id_morele = [] 
@@ -194,15 +204,11 @@ def update_prices():
             url_xkom.append(item.url)
             id_xkom.append(item.id)
 
-        # if item.shop_id == 2:
-            # url_euro.append(item.url)#TODO fix fucking euro
-            # id_euro.append(item.id)
-
-        if item.shop_id == 3:
+        if item.shop_id == 2:
             url_morele.append(item.url)
             id_morele.append(item.id)
 
-        if item.shop_id == 4:
+        if item.shop_id == 3:
             url_media.append(item.url)
             id_media.append(item.id)
 
@@ -211,7 +217,6 @@ def update_prices():
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(check_xkom, url_xkom, id_xkom)
-        # results = executor.map(check_euro, url_euro, id_euro)
         results = executor.map(check_morele, url_morele, id_morele)
         results = executor.map(check_media, url_media, id_media)
     
@@ -248,7 +253,7 @@ def x_kom(objects, sort_by="price_low", url=False):
 
     repo = soup.find(class_="sc-bwzfXH sc-162ysh3-0 jaUCAK sc-htpNat gSgMmi") #contener
     try:
-        repo_list = repo.find_all(class_='sc-162ysh3-1 esXNpw sc-bwzfXH dXCVXY') # item block
+        repo_list = repo.find_all(class_='sc-162ysh3-1 cVKkKd sc-bwzfXH dXCVXY') # item block
     except:
         repo_list = []
         price0 = "No in stock"
@@ -262,6 +267,7 @@ def x_kom(objects, sort_by="price_low", url=False):
             price0 = price1[0].strip()
         except:
             price0 = "No in stock"
+            break
 
         link0 = repo.find('a')
         link0 = link0.get("href")
@@ -271,7 +277,9 @@ def x_kom(objects, sort_by="price_low", url=False):
         name.append(name0)
         price.append(price0)
         link.append(link0)
+
     if name:
+        # name = format_name(name)
         name, price, link = sort(name, price, link, sort_by)
         save_query(name, price, link, 1)
 
@@ -290,50 +298,7 @@ def check_xkom(url, id):
     price0 = price1[0].strip()
     
     save_single(id, price0)
-        
-def euro(objects, sort_by="price_low", url=False):
-    main_page = "https://www.euro.com.pl/search.bhtml?keyword="
-    link_page = "https://www.euro.com.pl"
-
-    if url == False:
-        url = str(main_page+str(objects))
-    else:
-        url = str(url)
-
-    page = requests.get(str(url))
-    soup = BeautifulSoup(page.text, 'html.parser')
-
-    name = []
-    price = []
-    link = [] 
-    repo = soup.find(class_="page") #contener
-    repo_list = repo.find_all(class_='product-box js-UA-product') # item block
-
-    for repo in repo_list:
-        name1 = repo.find(class_='product-name').text.split('/')
-        name0 = name1[0].strip()
-        try:
-            price1 = repo.find(class_='price-normal selenium-price-normal').text.split('/')
-            price0 = price1[0].strip()
-        except:
-            price0 = "No in stock"
-
-        link0 = repo.find('a')
-        link0 = link0.get("href")
-        link0 = link_page + link0
-
-        price0 = format_price(price0)
-        name.append(name0)
-        price.append(price0)
-        link.append(link0)
-    
-    if name:
-        name, price, link = sort(name, price, link, sort_by)
-        save_query(name, price, link, 1)
-        return(name, price, link)
-    else:
-        return("", "", "")
-     
+            
 def morele(objects, sort_by="price_low", url=False):
     main_page = "https://www.morele.net/wyszukiwarka/0/0/,,,,,,,,,,,,/1/?q="
     link_page = "https://www.morele.net"
@@ -382,7 +347,7 @@ def morele(objects, sort_by="price_low", url=False):
 
     if name:
         name, price, link = sort(name, price, link, sort_by)
-        save_query(name, price, link, 3)
+        save_query(name, price, link, 2)
         return(name, price, link)
     else:
         return("", "", "")
@@ -447,7 +412,7 @@ def media_expert(objects, sort_by="price_low", url=False):
         link.append(link0)
     if name:
         name, price, link = sort(name, price, link, sort_by)
-        save_query(name, price, link, 4)
+        save_query(name, price, link, 3)
         return(name, price, link)
     else:
         return("", "", "")
@@ -466,12 +431,13 @@ def check_media(url, id):
 def query_run(url, shop_id):
     if shop_id == 1:
         name, price1, link = x_kom("", "name_low", url)
+
     if shop_id == 2:
-        name, price1, link = euro("", "name_low", url)
-    if shop_id == 3:
         name, price1, link = morele("", "name_low", url)
-    if shop_id == 4:
+        
+    if shop_id == 3:
         name, price1, link = media_expert("", "name_low", url)
+
     save_query(name, price1, link, shop_id)
 
     
@@ -495,19 +461,14 @@ def query_prep(choice):
                 url = "https://www.x-kom.pl/szukaj?page="+str(y)+"&sort_by=accuracy_desc&q="+str(word_list[x])
                 urls.append(url)
                 shop_id.append(1)
-                """
-                url = "https://www.euro.com.pl/search,strona-"+str(y)+".bhtml?keyword="+str(word_list[x])
-                urls.append(url)
-                shop_id.append(2)
-                """
 
                 url = "https://www.morele.net/wyszukiwarka/0/0/,,,,,,,,0,,,,/"+str(y)+"/?q="+str(word_list[x])
                 urls.append(url)
-                shop_id.append(3)
+                shop_id.append(2)
 
                 url = "https://www.mediaexpert.pl/search?limit=30&page="+str(y)+"&query%5Bmenu_item%5D=&query%5Bquerystring%5D="+str(word_list[x])
                 urls.append(url)
-                shop_id.append(4)
+                shop_id.append(3)
 
     if choice == "x_kom":
         for x in range(len(word_list)):
@@ -515,28 +476,20 @@ def query_prep(choice):
                 url = "https://www.x-kom.pl/szukaj?page="+str(y)+"&sort_by=accuracy_desc&q="+str(word_list[x])
                 urls.append(url)
                 shop_id.append(1)
-    """ TODO
-    if choice == "euro":
-        for x in range(len(word_list)):
-            for y in range(passes):
-                url = "https://www.euro.com.pl/search,strona-"+str(y)+".bhtml?keyword="+str(word_list[x])
-                urls.append(url)
-                shop_id.append(2)
-    """
 
     if choice == "morele":
         for x in range(len(word_list)):
             for y in range(passes):     
                 url = "https://www.morele.net/wyszukiwarka/0/0/,,,,,,,,0,,,,/"+str(y)+"/?q="+str(word_list[x])
                 urls.append(url)
-                shop_id.append(3)
+                shop_id.append(2)
 
     if choice == "media_expert":
         for x in range(len(word_list)):
             for y in range(passes):     
                 url = "https://www.mediaexpert.pl/search?limit=30&page="+str(y)+"&query%5Bmenu_item%5D=&query%5Bquerystring%5D="+str(word_list[x])
                 urls.append(url)
-                shop_id.append(4)
+                shop_id.append(3)
                 
     start = time.time()
     stats_start = len(Item.query.order_by(Item.id).all())
@@ -558,12 +511,11 @@ def check_stats():
     prices = Prices.query.order_by(Prices.id).all()
 
     xkom = len(Item.query.filter_by(shop_id=1).all())
-    euro = len(Item.query.filter_by(shop_id=2).all()) 
     morele = len(Item.query.filter_by(shop_id=3).all())
     media = len(Item.query.filter_by(shop_id=4).all()) 
     avg = len(prices)/len(items)
 
-    return len(items), len(prices), xkom, euro, morele, media, avg
+    return len(items), len(prices), xkom, morele, media, avg
 
 def query_stats(time, added):
     now_date = now.strftime("%d-%m-%Y")
@@ -612,19 +564,10 @@ def return_search(item, sort_by1):
         morele_name, morele_price, morele_link = morele0.result()
         media_name, media_price, media_link = media0.result()
 
-    # euro = executor.submit(euro, item, sort_by1)TODO euro fix
-    # euro_name, euro_price, euro_link = euro.result()
-    #---- delet this
-    euro_name = [] 
-    euro_price = [] 
-    euro_link = [] 
-    #---- delet this
-    
-
-    return  x_name, x_price, x_link, euro_name, euro_price, euro_link, morele_name, morele_price, morele_link, media_name, media_price, media_link
+    return  x_name, x_price, x_link, morele_name, morele_price, morele_link, media_name, media_price, media_link
 
 
-def compare(names):
+def return_lowest_price(names):
     lowest_price = []
     l_price = []
     for name in names:
@@ -639,23 +582,35 @@ def compare(names):
                 l_price.clear() 
 
     return lowest_price
+
+def return_highest_price(names):
+    highest_price = []
+    h_price = []
+    for name in names:
+        items = Item.query.filter_by(name=name).all()
+        for item in items:
+            prices = Prices.query.filter_by(item_id=item.id).all()
+
+            for price in prices:
+                h_price.append(price.price)
+                h_price.sort()
+                highest_price.append(h_price[-1])
+                h_price.clear() 
+
+    return highest_price
         
-def query_by_url(url0):
+def add_spec(url0):
     url = list(url0)
     xkom_template = url[12]+url[13]+url[14]+url[15]+url[16]
-    euro_template = url[12]+url[13]+url[14]+url[15]
     morele_template = url[12]+url[13]+url[14]+url[15]+url[16]+url[17]
     media_template = url[12]+url[13]+url[14]+url[15]+url[16]
-
     
     if xkom_template == "x-kom":
-        spec_xkom(url0)
-    if euro_template == "euro":
-        pass
+        save_spec(url0, 1)
     if morele_template == "morele":
-        pass
+        save_spec(url0, 2)
     if media_template == "media":
-        pass
+        save_spec(url0, 3)
 
 def get_name_by_url_xkom(url):
     page = requests.get(str(url))
@@ -665,7 +620,7 @@ def get_name_by_url_xkom(url):
     name1 = repo.find(class_='sc-1x6crnh-5 cYILyh').text.split('/')
         
     name = ''.join(name1)
-    name = format_name(name)
+    # name = format_name(name)
     return name
 
 def get_price_by_url_xkom(url):
@@ -682,14 +637,13 @@ def get_price_by_url_xkom(url):
     price = format_price(price0)
     return price
 
-def spec_xkom(url):
+def save_spec(url, shop_id):
     item = Item.query.filter_by(url=url).first()
 
     if not item:
         name = get_name_by_url_xkom(url)
-        print('-----------', 'name', name) 
         
-        item = Item(name=name, url=url, shop_id=1)
+        item = Item(name=name, url=url, shop_id=shop_id)
         db.session.add(item)
         db.session.commit()
 
