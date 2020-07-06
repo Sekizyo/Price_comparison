@@ -29,12 +29,10 @@ class Query(db.Model):
 
     run_time = db.Column(db.Text, nullable=False)
     added = db.Column(db.Integer, nullable=False)
-    match = db.Column(db.Integer, nullable=False)
-    searched = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f"Query(ID: '{self.id}', Date: '{self.date}', Time: '{self.time}', Run time: '{self.run_time}', Added: '{self.added}', Match: '{self.match}', Total: '{self.total}')"
+        return f"Query(ID: '{self.id}', Date: '{self.date}', Time: '{self.time}', Run time: '{self.run_time}', Added: '{self.added}', Total: '{self.total}')"
 
 class Update(db.Model):
     id = db.Column(db.Integer, primary_key=True)

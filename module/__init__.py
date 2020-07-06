@@ -1,4 +1,3 @@
-#Created by Matas Pieczulis for Michał Jurkun
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 

@@ -6,13 +6,16 @@ from datetime import time
 from flask import render_template, url_for, flash, redirect, request, Response
 
 from module import app, db
-from module.models import Item, Prices
-from module.check import x_kom, morele, media_expert, query_prep, check_stats, return_query_stats, update_prices, return_update_stats, return_search, return_lowest_price, return_highest_price, add_spec
+# from module.models import Item, Prices
 from module.forms import Search_item, Query_items, Spec_item, Spec_add
+
+from module.query import query_run
+from module.check import search_all, update_prices
+from module.pretty import get_lowest_price, get_highest_price
+from module.stats import return_total_stats, return_update_stats, return_spec_stats, return_query_stats
 
 now = datetime.datetime.now()
 now_date = now.strftime("%d-%m-%Y")
-now_date2 = now.strftime("%Y-%m-%d")
 
 @app.route('/')
 @app.route("/index", methods=['GET', 'POST'])
@@ -37,14 +40,14 @@ def search_result():
     item_name = form.item.data
     sort_by = form.sort_by.data
 
-    x_name, x_price, x_link, morele_name, morele_price, morele_link, media_name, media_price, media_link = return_search(item_name, sort_by)
-    x_low_prices = return_lowest_price(x_name)
-    morele_low_prices = return_lowest_price(morele_name)
-    media_low_prices = return_lowest_price(media_name)
+    x_name, x_price, x_link, morele_name, morele_price, morele_link, media_name, media_price, media_link = search_all(item_name, sort_by)
+    x_low_prices = get_lowest_price(x_name)
+    morele_low_prices = get_lowest_price(morele_name)
+    media_low_prices = get_lowest_price(media_name)
 
-    x_high_prices = return_highest_price(x_name)
-    morele_high_prices = return_highest_price(morele_name)
-    media_high_prices = return_highest_price(media_name)
+    x_high_prices = get_highest_price(x_name)
+    morele_high_prices = get_highest_price(morele_name)
+    media_high_prices = get_highest_price(media_name)
 
     x_kom_len = len(x_name)
     morele_len = len(morele_name)
@@ -64,9 +67,9 @@ def query():
 def query_search():
     form = Query_items()
     query_items = form.query.data
-    query_prep(query_items)
-    date, time, run_time, added, match, searched, total = return_query_stats()
-    return render_template('query_result.html', time=time, run_time=run_time, added=added, match=match, searched=searched, total=total)
+    query_run(query_items)
+    date, time, run_time, added, total = return_query_stats()
+    return render_template('query_result.html', time=time, run_time=run_time, added=added, total=total)
 
 @app.route('/spec', methods=['GET', 'POST'])
 def spec():
@@ -82,13 +85,13 @@ def spec_add():
     
     return render_template('spec_add.html', form=form)
 
-@app.route('/spec_add2', methods=['GET', 'POST'])
-def spec_add():
-    form = Spec_add()
-    url = form.query.data
-    add_spec(url)
+@app.route('/spec_confirm', methods=['GET', 'POST'])
+def spec_confirm():
+    # form = Spec_add()
+    # url = form.query.data
+    # add_spec(url)
     
-    return render_template('spec_add.html', form=form)
+    return redirect(url_for('spec'))
 
 @app.route('/spec_show', methods=['GET', 'POST'])
 def spec_show():
@@ -124,8 +127,8 @@ def spec_result():
 
 @app.route('/stats', methods=['GET', 'POST'])
 def stats():
-    items, prices, xkom, morele, media, avg = check_stats()
-    query_date, query_time, query_run_time, query_added, query_match, query_searched, query_total = return_query_stats() 
+    items, prices, xkom, morele, media, avg = return_total_stats()
+    query_date, query_time, query_run_time, query_added, query_total = return_query_stats() 
     return render_template('stats.html', items=items, prices=prices, xkom=xkom, morele=morele, media=media, avg=avg, query_date=query_date, query_time=query_time, query_run_time=query_run_time, query_added=query_added)
 
 @app.route('/update', methods=['GET', 'POST'])
