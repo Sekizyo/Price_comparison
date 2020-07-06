@@ -1,7 +1,7 @@
 import os
 import unittest
 from module.stats import return_query_stats
-from module import app, db
+# from module import app, dbs
 
 strings = ""
 intigers = 0

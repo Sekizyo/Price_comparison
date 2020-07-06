@@ -1,5 +1,6 @@
 import os
 import unittest
+import requests
 from module.pretty import *
 
 strings = ""
