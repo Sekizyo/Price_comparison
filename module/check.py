@@ -223,31 +223,6 @@ def search_all(item, sort_by1):
         media_name, media_price, media_link = media0.result()
 
     return x_name, x_price, x_link, morele_name, morele_price, morele_link, media_name, media_price, media_link
-   
-def get_name_by_url_xkom(url):
-    page = requests.get(str(url))
-    soup = BeautifulSoup(page.text, 'html.parser')
-
-    repo = soup.find(class_="page-wrapper") #contener
-    name1 = repo.find(class_='sc-1x6crnh-5 cYILyh').text.split('/')
-        
-    name = ''.join(name1)
-    # name = format_name(name)
-    return name
-
-def get_price_by_url_xkom(url):
-    page = requests.get(str(url))
-    soup = BeautifulSoup(page.text, 'html.parser')
-
-    repo = soup.find(class_="page-wrapper") #contener
-    try:
-        price1 = repo.find(class_='u7xnnm-4 iVazGO').text.split('/')
-    except:
-        price1 = repo.find(class_='u7xnnm-3 gAOShm').text.split('/')
-
-    price0 = price1[0].strip()
-    price = format_price(price0)
-    return price
     
 def check_spec(shop):
     price = Spec_Prices.query.filter_by(shop_id=shop).all()#TODO check if price changed

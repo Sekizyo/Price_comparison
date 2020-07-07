@@ -2,10 +2,16 @@
 {% block content %}
 <h1 class="major"><center>Query</center></h1>
 <section id="main" class="wrapper">
-    <div style="text-align: center">
-		
+		<div class="inner" style="text-align: left; padding-left: 200px">
+            <h4>Spec items: {{len0}}</h4>
+    
+            {% for x in range(len0) %}
+            <ul>
+                <a href='{{urls.pop(0)}}'><li>{{ids.pop(0)}}, [{{shop_ids.pop(0)}}], {{item_ids.pop(0)}}, {{names.pop(0)}} | {{low_prices.pop(0)}} || {{high_prices.pop(0)}}</li></a>
+            </ul>
+            {% endfor %}
+        </div>
         
-    </div>
 </section>
 
 {% endblock content %}

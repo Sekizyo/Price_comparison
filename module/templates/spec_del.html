@@ -3,7 +3,18 @@
 <h1 class="major"><center>Query</center></h1>
 <section id="main" class="wrapper">
     <div style="text-align: center">
-		
+		<form action="http://localhost:5000/spec_del_confirm" method="POST"  enctype="multipart/form-data">
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form.id.label(class="form-control-label") }}
+                    {{ form.id(class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </fieldset>
+
+        </form>
         
     </div>
 </section>

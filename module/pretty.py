@@ -81,34 +81,86 @@ def sort(name, price, link, sort0="price_low"):
         
     return name, price, link
 
-def get_lowest_price(names):
+def get_lowest_price(names, single=False):
     lowest_price = []
     l_price = []
-    for name in names:
-        items = Item.query.filter_by(name=name).all()
-        for item in items:
-            prices = Prices.query.filter_by(item_id=item.id).all()
+    if single == True:
+        item = Item.query.filter_by(name=names).first()
+        prices = Prices.query.filter_by(item_id=item.id).all()
+        for price in prices:
+            l_price.append(price.price)
+            l_price.sort()
+            lowest_price.append(l_price[0])
+            l_price.clear() 
 
-            for price in prices:
-                l_price.append(price.price)
-                l_price.sort()
-                lowest_price.append(l_price[0])
-                l_price.clear() 
+    else:
+        for name in names:
+            items = Item.query.filter_by(name=name).all()
+            for item in items:
+                prices = Prices.query.filter_by(item_id=item.id).all()
+
+                for price in prices:
+                    l_price.append(price.price)
+                    l_price.sort()
+                    lowest_price.append(l_price[0])
+                    l_price.clear() 
 
     return lowest_price
 
-def get_highest_price(names):
+def get_highest_price(names, single=False):
     highest_price = []
     h_price = []
-    for name in names:
-        items = Item.query.filter_by(name=name).all()
-        for item in items:
-            prices = Prices.query.filter_by(item_id=item.id).all()
+    if single == True:
+        item = Item.query.filter_by(name=names).first()
+        prices = Prices.query.filter_by(item_id=item.id).all()
+        for price in prices:
+            h_price.append(price.price)
+            h_price.sort()
+            highest_price.append(h_price[-1])
+            h_price.clear() 
+    else:
+        for name in names:
+            items = Item.query.filter_by(name=name).all()
+            for item in items:
+                prices = Prices.query.filter_by(item_id=item.id).all()
 
-            for price in prices:
-                h_price.append(price.price)
-                h_price.sort()
-                highest_price.append(h_price[-1])
-                h_price.clear() 
+                for price in prices:
+                    h_price.append(price.price)
+                    h_price.sort()
+                    highest_price.append(h_price[-1])
+                    h_price.clear() 
 
     return highest_price
+
+def get_name_by_url_xkom(url):
+    import requests
+    from webbot import Browser
+    from bs4 import BeautifulSoup
+
+    page = requests.get(str(url))
+    soup = BeautifulSoup(page.text, 'html.parser')
+
+    repo = soup.find(class_="page-wrapper") #contener
+    name1 = repo.find(class_='sc-1x6crnh-5 cYILyh').text.split('/')
+        
+    name = ''.join(name1)
+    # name = format_name(name)
+    return name
+
+def get_price_by_url_xkom(url):
+    import requests
+    from webbot import Browser
+    from bs4 import BeautifulSoup
+
+    page = requests.get(str(url))
+    soup = BeautifulSoup(page.text, 'html.parser')
+
+    repo = soup.find(class_="page-wrapper") #contener
+    try:
+        price1 = repo.find(class_='u7xnnm-4 iVazGO').text.split('/')
+    except:
+        price1 = repo.find(class_='u7xnnm-3 gAOShm').text.split('/')
+
+    price0 = price1[0].strip()
+    price = format_price(price0)
+    return price

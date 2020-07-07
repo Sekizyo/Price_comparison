@@ -6,13 +6,13 @@ from datetime import time
 from flask import render_template, url_for, flash, redirect, request, Response
 
 from module import app, db
-# from module.models import Item, Prices
-from module.forms import Search_item, Query_items, Spec_item, Spec_add
+from module.forms import Search_item, Query_items, Spec_item, Spec_add, Spec_del
 
 from module.query import query_run
 from module.check import search_all, update_prices
 from module.pretty import get_lowest_price, get_highest_price
 from module.stats import return_total_stats, return_update_stats, return_spec_stats, return_query_stats
+from module.sql_func import add_spec_by_url, del_spec
 
 now = datetime.datetime.now()
 now_date = now.strftime("%d-%m-%Y")
@@ -85,44 +85,47 @@ def spec_add():
     
     return render_template('spec_add.html', form=form)
 
-@app.route('/spec_confirm', methods=['GET', 'POST'])
-def spec_confirm():
-    # form = Spec_add()
-    # url = form.query.data
-    # add_spec(url)
+@app.route('/spec_add_confirm', methods=['GET', 'POST'])
+def spec_add_confirm():
+    form = Spec_add()
+    url = form.url.data
+    add_spec_by_url(url)
     
     return redirect(url_for('spec'))
 
 @app.route('/spec_show', methods=['GET', 'POST'])
 def spec_show():
+    ids, item_ids, names, urls, shop_ids = return_spec_stats()
+    low_prices = []
+    high_prices = [] 
     
+    len0=len(ids)
+    for x in range(len(ids)):
+        if shop_ids[x] == 1:
+            
+            low_prices.append(get_lowest_price(names[x], True))
+            high_prices.append(get_highest_price(names[x], True))
 
-    return render_template('spec_show.html')
+        if shop_ids[x] == 2:
+            low_prices.append(get_lowest_price(names[x], True))
+            high_prices.append(get_highest_price(names[x], True))
+
+        if shop_ids[x] == 3:
+            low_prices.append(get_lowest_price(names[x], True))
+            high_prices.append(get_highest_price(names[x], True))
+
+    return render_template('spec_show.html', len0=len0, ids=ids, item_ids=item_ids, names=names, urls=urls, shop_ids=shop_ids, low_prices=low_prices, high_prices=high_prices)
 
 @app.route('/spec_del', methods=['GET', 'POST'])
 def spec_del():
-    
+    form = Spec_del()
+    return render_template('spec_del.html', form=form)
 
-    return render_template('spec_del.html')
+@app.route('/spec_del_confirm', methods=['GET', 'POST'])
+def spec_del_confirm():
+    form = Spec_del()
+    del_spec(form.id.data)
 
-@app.route('/spec_result', methods=['GET', 'POST'])#TODO add spec to system
-def spec_result():
-    form = Spec_item()
-
-    url = form.url.data
-    choice = form.choice.data
-
-    if choice == "x_kom":
-        # spec_xkom(url)
-        pass
-    if choice == "morele":
-        #spec_morele(url)
-        pass
-    if choice == "media_expert":
-        #spec_media(url)
-        pass
-
-    flash('Succes', 'succes')
     return redirect(url_for('spec'))
 
 @app.route('/stats', methods=['GET', 'POST'])

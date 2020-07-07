@@ -1,6 +1,6 @@
 from module import app, db
 from module.models import Item, Prices, Query, Update, Spec
-from module.pretty import time_start, time_end, format_price
+from module.pretty import time_start, time_end, format_price, get_name_by_url_xkom, get_price_by_url_xkom
 from flask_sqlalchemy import BaseQuery
 
 import concurrent.futures
@@ -10,14 +10,22 @@ import datetime
 now = datetime.datetime.now()
 now_date = now.strftime("%d-%m-%Y")
 
-def add_spec(url, shop_id):
+def add_spec(url):
     item = Item.query.filter_by(url=url).first()
 
     if not item:
         name = get_name_by_url_xkom(url)#TODO fix
         
-        item = Item(name=name, url=url, shop_id=shop_id)
+        item = Item(name=name, url=url, shop_id=item.id)
         db.session.add(item)
+        db.session.commit()
+
+        print('-----------', 'prices', prices) 
+        prices = get_price_by_url_xkom(url)
+        
+        price = Prices(item_id=item.id, created=now_date, price=prices)
+
+        db.session.add(price)
         db.session.commit()
 
     spec = Spec.query.filter_by(item_id=item.id).first()
@@ -108,6 +116,12 @@ def add_spec(url, shop_id):
         db.session.add(spec)
         db.session.commit()
 
+def del_spec(id0):
+    spec = Spec.query.filter_by(id=id0).first()
+    
+    db.session.delete(spec)
+    db.session.commit()
+
 def add_query_stats(time, added):
     now_date = now.strftime("%d-%m-%Y")
     now_time = now.strftime("%H:%M:%S")
@@ -116,3 +130,5 @@ def add_query_stats(time, added):
     query = Query(date=now_date, time=now_time, run_time=time, added=added, total=total)
     db.session.add(query)
     db.session.commit()
+
+

@@ -15,7 +15,12 @@ class Spec_item(FlaskForm):
     url = StringField("Url", validators=[DataRequired()])
     choice = SelectField("Choice", validators=[DataRequired()], choices=[('all', "All"), ('x_kom', 'X-kom'), ('morele', 'Morele'), ('media_expert', 'Media expert')])
     submit = SubmitField('Potwierdz')
+
 class Spec_add(FlaskForm):
     url = StringField("Url", validators=[DataRequired()])
+    submit = SubmitField('Potwierdz')
+
+class Spec_del(FlaskForm):
+    id = StringField("Spec id", validators=[DataRequired()])
     submit = SubmitField('Potwierdz')
     
